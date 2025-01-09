@@ -1,7 +1,8 @@
 # Import required Python libraries
+import math
 import os
 import time
-import math
+
 import RPi.GPIO as GPIO
 from intruder_functions import *
 
@@ -22,43 +23,43 @@ GPIO.setup(GPIO_ECHO,GPIO.IN)      # Echo
 GPIO.output(GPIO_TRIGGER, False)
 
 try:
-	while True:
-		# Allow module to settle
-		time.sleep(0.5)
+    while True:
+        # Allow module to settle
+        time.sleep(0.5)
 
-		# Send 10us pulse to trigger
-		GPIO.output(GPIO_TRIGGER, True)
-		time.sleep(0.00001)
-		GPIO.output(GPIO_TRIGGER, False)
-		start = time.time()
+        # Send 10us pulse to trigger
+        GPIO.output(GPIO_TRIGGER, True)
+        time.sleep(0.00001)
+        GPIO.output(GPIO_TRIGGER, False)
+        start = time.time()
 
-		while GPIO.input(GPIO_ECHO)==0:
-			start = time.time()
+        while GPIO.input(GPIO_ECHO)==0:
+            start = time.time()
 
-		while GPIO.input(GPIO_ECHO)==1:
-			stop = time.time()
+        while GPIO.input(GPIO_ECHO)==1:
+            stop = time.time()
 
-		# Calculate pulse length
-		elapsed = stop-start
+        # Calculate pulse length
+        elapsed = stop-start
 
-		# Distance pulse travelled in that time is time
-		# multiplied by the speed of sound (cm/s)
-		distancet = elapsed * 34300
+        # Distance pulse travelled in that time is time
+        # multiplied by the speed of sound (cm/s)
+        distancet = elapsed * 34300
 
-		# That was the distance there and back so halve the value
-		distance = distancet / 2
+        # That was the distance there and back so halve the value
+        distance = distancet / 2
 
-		os.system("clear")
-		print ("Ultrasonic Measurement")
-		print  ("Distance :", distance, " cm")
+        os.system("clear")
+        print ("Ultrasonic Measurement")
+        print  ("Distance :", distance, " cm")
 
-		if distance < 50:
-			is_intruder_detected = True
-			intruder_detected(math.floor(distance))
-		elif distance >= 50:
-			is_intruder_detected = False
-			intruder_left()
+        if distance < 50:
+            is_intruder_detected = True
+            intruder_detected(math.floor(distance))
+        elif distance >= 50:
+            is_intruder_detected = False
+            intruder_left()
 
 except KeyboardInterrupt:
-	print("Program Terminated")
-	GPIO.cleanup()
+    print("Program Terminated")
+    GPIO.cleanup()
